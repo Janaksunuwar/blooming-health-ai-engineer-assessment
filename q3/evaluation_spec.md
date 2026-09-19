@@ -49,6 +49,8 @@ The minimum evaluator should run without an API key and perform deterministic ch
 - Flag repeated questions, skipped required questions, invalid transitions, and premature closing.
 - Report missing structured captured-field values as an input gap.
 - Retain explicit volunteered answers without treating the corresponding questions as asked.
+- Detect leaked internal/template artifacts in agent output (e.g. a placeholder string like "(Waiting for your response.)" that should never reach spoken output) as a critical failure, independent of question-identification logic.
+- Detect when a caller appears to correct a previously given answer, flagging the correction and, when the new value can't be confidently resolved, returning an uncertain_answer_correction result rather than silently overwriting the prior answer.
 
 Critical failures include wrong branching after an unambiguous answer, skipping a required question before a terminal decision, closing with a disposition contradicted by the caller, or claiming completion when the transcript leaves a required branch unresolved.
 
