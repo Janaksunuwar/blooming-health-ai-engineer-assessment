@@ -524,13 +524,69 @@
       "workflow_status": "PASS"
     },
     {
-      "critical_failures": [],
+      "critical_failures": [
+        {
+          "code": "leaked_internal_text",
+          "evidence": {
+            "role": "agent",
+            "text": "First \u2014 would you like our help renewing your Medi-Cal right now, over the phone? \n\n(Waiting for your response.)",
+            "turn": -1
+          },
+          "message": "Agent turn contains leaked internal template text."
+        },
+        {
+          "code": "leaked_internal_text",
+          "evidence": {
+            "role": "agent",
+            "text": "Our records show your Medi-Cal may not be active right now. Can you confirm \u2014 do you currently have active Medi-Cal coverage? \n\n(Waiting for your response.)",
+            "turn": 0
+          },
+          "message": "Agent turn contains leaked internal template text."
+        },
+        {
+          "code": "leaked_internal_text",
+          "evidence": {
+            "role": "agent",
+            "text": "Do you currently have any other health insurance \u2014 through work, school, Kaiser, TriCare, Covered California, or a private plan? \n\n(Waiting for your response.)",
+            "turn": 1
+          },
+          "message": "Agent turn contains leaked internal template text."
+        },
+        {
+          "code": "leaked_internal_text",
+          "evidence": {
+            "role": "agent",
+            "text": "Do you still live in San Diego County? \n\n(Waiting for your response.)",
+            "turn": 2
+          },
+          "message": "Agent turn contains leaked internal template text."
+        },
+        {
+          "code": "leaked_internal_text",
+          "evidence": {
+            "role": "agent",
+            "text": "Did you receive the yellow renewal packet from the county \u2014 and do you still have it?\n\n(Waiting for your response.)",
+            "turn": 3
+          },
+          "message": "Agent turn contains leaked internal template text."
+        },
+        {
+          "code": "leaked_internal_text",
+          "evidence": {
+            "role": "agent",
+            "text": "Since you still have the county's packet, you've got two options: I can help you complete your renewal right now over the phone, or set up an in-person appointment with Family Health Centers of San Diego to go through the packet with you. Which would you prefer? \n\n(Waiting for your response.)",
+            "turn": 4
+          },
+          "message": "Agent turn contains leaked internal template text."
+        }
+      ],
       "evaluation_mode": "transcript_only",
       "expected_disposition": "escalated_chw_appointment",
       "field_accuracy_status": "NOT_EVALUATED",
       "observed_disposition": "escalated_chw_appointment",
-      "overall_status": "PASS",
+      "overall_status": "FAIL",
       "recommended_engineering_fixes": [
+        "Review template rendering \u2014 internal placeholder text should never reach agent output.",
         "Provide claimed captured fields to evaluate field accuracy.",
         "Confirm or persist volunteered information before relying on it for workflow progression."
       ],
@@ -703,7 +759,7 @@
           }
         }
       },
-      "task_completion_status": "PASS",
+      "task_completion_status": "FAIL",
       "thread_id": "thread_05",
       "uncertainties": [
         {
@@ -723,7 +779,7 @@
           "question_id": "q3_coverage"
         }
       ],
-      "workflow_status": "PASS"
+      "workflow_status": "FAIL"
     },
     {
       "critical_failures": [],
@@ -1361,13 +1417,24 @@
       "workflow_status": "UNCERTAIN"
     },
     {
-      "critical_failures": [],
+      "critical_failures": [
+        {
+          "code": "leaked_internal_text",
+          "evidence": {
+            "role": "agent",
+            "text": "Our records show your Medi-Cal may not be active right now. Can you confirm \u2014 do you currently have active Medi-Cal coverage? \n\n(Waiting for your response.)",
+            "turn": 0
+          },
+          "message": "Agent turn contains leaked internal template text."
+        }
+      ],
       "evaluation_mode": "transcript_only",
       "expected_disposition": null,
       "field_accuracy_status": "NOT_EVALUATED",
       "observed_disposition": null,
-      "overall_status": "UNCERTAIN",
+      "overall_status": "FAIL",
       "recommended_engineering_fixes": [
+        "Review template rendering \u2014 internal placeholder text should never reach agent output.",
         "Provide claimed captured fields to evaluate field accuracy.",
         "Confirm or persist volunteered information before relying on it for workflow progression."
       ],
@@ -1457,7 +1524,7 @@
           }
         }
       },
-      "task_completion_status": "UNCERTAIN",
+      "task_completion_status": "FAIL",
       "thread_id": "thread_10",
       "uncertainties": [
         {
@@ -1481,7 +1548,7 @@
           "question_id": "q2_active"
         }
       ],
-      "workflow_status": "UNCERTAIN"
+      "workflow_status": "FAIL"
     }
   ]
 }

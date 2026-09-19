@@ -530,6 +530,37 @@ class EvaluatorTest(unittest.TestCase):
         )
         self.assertEqual(result["task_completion_status"], UNCERTAIN)
 
+    def test_leaked_internal_template_text_is_critical_failure(self):
+        result = self.result(
+            [
+                msg(
+                    "agent",
+                    "First, would you like our help renewing your Medi-Cal right now, over the phone? \n\n(Waiting for your response.)",
+                ),
+                msg("caller", "Yes."),
+            ]
+        )
+        leaked = [issue for issue in result["critical_failures"] if issue["code"] == "leaked_internal_text"]
+        self.assertEqual(len(leaked), 1)
+        self.assertEqual(leaked[0]["evidence"]["turn"], 0)
+        self.assertEqual(leaked[0]["evidence"]["role"], "agent")
+        self.assertIn("(Waiting for your response.)", leaked[0]["evidence"]["text"])
+        self.assertIn(
+            "Review template rendering — internal placeholder text should never reach agent output.",
+            result["recommended_engineering_fixes"],
+        )
+
+    def test_leaked_internal_template_text_fires_even_when_question_matches(self):
+        result = self.result(
+            [
+                msg(
+                    "agent",
+                    "First, would you like our help renewing your Medi-Cal right now, over the phone? (waiting for your response.)",
+                ),
+            ]
+        )
+        self.assertTrue(any(issue["code"] == "leaked_internal_text" for issue in result["critical_failures"]))
+
 
 if __name__ == "__main__":
     unittest.main()

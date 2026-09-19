@@ -64,6 +64,10 @@ def evaluate_thread(
             qid = identify_question(text, questions)
             disposition = identify_disposition(text, workflow["outcomes"])
             complete = is_completion_language(text)
+            if has_leaked_internal_text(text):
+                critical.append(
+                    _issue("leaked_internal_text", "Agent turn contains leaked internal template text.", message)
+                )
             if qid:
                 if qid in asked:
                     warnings.append(_issue("repeated_question", f"Agent repeated {qid}.", message))
@@ -372,6 +376,10 @@ def is_completion_language(text: str) -> bool:
     return "let s get your renewal started" in ntext or "let s get started" in ntext
 
 
+def has_leaked_internal_text(text: str) -> bool:
+    return "(waiting for your response.)" in text.lower()
+
+
 def classify_answer(question: Question, text: str) -> dict[str, Any]:
     ntext = normalize(text)
     if _ambiguous(ntext):
@@ -602,6 +610,8 @@ def _fixes(
         fixes.append("Review workflow state management and next-question authorization.")
     if "premature_terminal" in codes:
         fixes.append("Ensure the agent resolves the current workflow question before closing or announcing completion.")
+    if "leaked_internal_text" in codes:
+        fixes.append("Review template rendering — internal placeholder text should never reach agent output.")
     if "incorrect_terminal_disposition" in codes:
         fixes.append("Review terminal-disposition selection against the configured workflow route.")
     if "missing_captured_fields" in codes:
