@@ -163,6 +163,7 @@ def msg(role, text, turn=0):
 
 
 class EvaluatorTest(unittest.TestCase):
+    # Captured-field records below are synthetic unit-test fixtures, not original assessment inputs.
     def result(self, messages, captured=None):
         return evaluate_dataset(dataset(messages), captured_fields=captured)["results"][0]
 
@@ -351,6 +352,100 @@ class EvaluatorTest(unittest.TestCase):
         evidence = result["supporting_evidence"]
         self.assertIn("q3_coverage", evidence["volunteered_information"])
         self.assertNotIn("q3_coverage", evidence["asked_questions"])
+
+    def test_correction_supersedes_active_answer_before_closing(self):
+        result = self.result(
+            [
+                msg("agent", "First, would you like our help renewing your Medi-Cal right now, over the phone?"),
+                msg("caller", "Yes."),
+                msg("agent", "Our records show your Medi-Cal may not be active right now. Can you confirm, do you currently have active Medi-Cal coverage?"),
+                msg("caller", "My Medi-Cal is active."),
+                msg("caller", "Actually, it isn't active right now."),
+                msg("agent", "That's great news, there is nothing you need to do right now."),
+            ]
+        )
+        self.assertEqual(result["overall_status"], FAIL)
+        self.assertEqual(
+            result["supporting_evidence"]["classified_answers"]["q2_active"]["scenario_id"],
+            "inactive",
+        )
+        self.assertIn("previous_answer", result["supporting_evidence"]["classified_answers"]["q2_active"])
+        self.assertTrue(any(issue["code"] == "answer_corrected" for issue in result["warnings"]))
+
+    def test_correction_same_answer_does_not_fabricate_contradiction(self):
+        result = self.result(
+            [
+                msg("agent", "First, would you like our help renewing your Medi-Cal right now, over the phone?"),
+                msg("caller", "Yes."),
+                msg("agent", "Our records show your Medi-Cal may not be active right now. Can you confirm, do you currently have active Medi-Cal coverage?"),
+                msg("caller", "My Medi-Cal is active."),
+                msg("caller", "Actually, yes, it is active."),
+                msg("agent", "That's great news, there is nothing you need to do right now."),
+            ]
+        )
+        self.assertEqual(result["overall_status"], PASS)
+        self.assertFalse(result["critical_failures"])
+        self.assertEqual(
+            result["supporting_evidence"]["classified_answers"]["q2_active"]["scenario_id"],
+            "active",
+        )
+
+    def test_generic_yes_is_not_volunteered_residency(self):
+        result = self.result([msg("caller", "Yes.")])
+        self.assertNotIn("q4_residency", result["supporting_evidence"]["volunteered_information"])
+
+    def test_explicit_early_residency_answer_is_retained(self):
+        result = self.result([msg("caller", "I still live in San Diego County.")])
+        self.assertEqual(
+            result["supporting_evidence"]["volunteered_information"]["q4_residency"]["scenario_id"],
+            "true",
+        )
+
+    def test_denial_of_one_coverage_type_is_not_affirmative_coverage(self):
+        result = self.result(
+            [
+                msg("agent", "First, would you like our help renewing your Medi-Cal right now, over the phone?"),
+                msg("caller", "Yes."),
+                msg("agent", "Our records show your Medi-Cal may not be active right now. Can you confirm, do you currently have active Medi-Cal coverage?"),
+                msg("caller", "Not active."),
+                msg("agent", "Do you currently have any other health insurance through work, school, Kaiser, TriCare, Covered California, or a private plan?"),
+                msg("caller", "I don't have insurance through work."),
+            ]
+        )
+        self.assertNotIn("q3_coverage", result["supporting_evidence"]["classified_answers"])
+        self.assertTrue(any(issue.get("question_id") == "q3_coverage" for issue in result["uncertainties"]))
+
+    def test_employer_coverage_is_affirmative(self):
+        result = self.result(
+            [
+                msg("agent", "First, would you like our help renewing your Medi-Cal right now, over the phone?"),
+                msg("caller", "Yes."),
+                msg("agent", "Our records show your Medi-Cal may not be active right now. Can you confirm, do you currently have active Medi-Cal coverage?"),
+                msg("caller", "Not active."),
+                msg("agent", "Do you currently have any other health insurance through work, school, Kaiser, TriCare, Covered California, or a private plan?"),
+                msg("caller", "I have insurance through my employer."),
+            ]
+        )
+        self.assertEqual(
+            result["supporting_evidence"]["classified_answers"]["q3_coverage"]["scenario_id"],
+            "true",
+        )
+
+    def test_negated_work_coverage_with_kaiser_is_affirmative(self):
+        result = self.result(
+            [
+                msg("agent", "First, would you like our help renewing your Medi-Cal right now, over the phone?"),
+                msg("caller", "Yes."),
+                msg("agent", "Our records show your Medi-Cal may not be active right now. Can you confirm, do you currently have active Medi-Cal coverage?"),
+                msg("caller", "Not active."),
+                msg("agent", "Do you currently have any other health insurance through work, school, Kaiser, TriCare, Covered California, or a private plan?"),
+                msg("caller", "I don't have insurance through work, but I have Kaiser."),
+            ]
+        )
+        self.assertEqual(
+            result["supporting_evidence"]["classified_answers"]["q3_coverage"]["scenario_id"],
+            "true",
+        )
 
     def test_workflow_failure_makes_task_completion_fail(self):
         result = self.result(

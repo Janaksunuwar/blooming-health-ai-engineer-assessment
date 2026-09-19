@@ -168,6 +168,36 @@ def evaluate_thread(
                 issue["question_id"] = last_question
                 uncertainties.append(issue)
         elif role == "caller":
+            correction = detect_correction(text, questions, answers)
+            if correction:
+                corrected_qid = correction["question_id"]
+                if correction["status"] == UNCERTAIN:
+                    issue = _issue(
+                        "uncertain_answer_correction",
+                        f"Caller appeared to correct {corrected_qid}, but the corrected value was unclear.",
+                        message,
+                    )
+                    issue["question_id"] = corrected_qid
+                    issue["previous_answer"] = correction["previous_answer"]
+                    uncertainties.append(issue)
+                    continue
+                _record_answer(
+                    answers,
+                    corrected_qid,
+                    {**correction, "evidence": _evidence(message)},
+                    source="caller_correction",
+                )
+                answers[corrected_qid]["previous_answer"] = correction["previous_answer"]
+                current = current_state_from_answers(questions, answers)
+                expected_disposition = current[1] if current[0] in {"disposition", "complete"} else None
+                issue = _issue(
+                    "answer_corrected",
+                    f"Caller corrected {corrected_qid}; later workflow checks use the corrected answer.",
+                    message,
+                )
+                issue["question_id"] = corrected_qid
+                warnings.append(issue)
+                continue
             for volunteered_qid, volunteered_answer in extract_volunteered_answers(text, questions).items():
                 volunteered.setdefault(volunteered_qid, {**volunteered_answer, "evidence": _evidence(message)})
 
@@ -290,6 +320,23 @@ def applicable_workflow_path(questions: dict[str, Question], answers: dict[str, 
     return path
 
 
+def current_state_from_answers(questions: dict[str, Question], answers: dict[str, dict[str, Any]]) -> tuple[str, str]:
+    current = "q1_intent"
+    seen: set[str] = set()
+    while current in questions and current not in seen:
+        seen.add(current)
+        answer = answers.get(current)
+        if not answer:
+            return ("question", current)
+        route = questions[current].routes.get(answer["scenario_id"])
+        if not route:
+            return ("question", current)
+        if route.target_kind != "question":
+            return (route.target_kind, route.target_id)
+        current = route.target_id
+    return ("question", current)
+
+
 def validate_claimed_value(question: Question, value: Any) -> str | None:
     canonical = canonical_field_value(question, value)
     if canonical is None:
@@ -407,10 +454,103 @@ def extract_volunteered_answers(text: str, questions: dict[str, Question]) -> di
     for qid, question in questions.items():
         if qid in {"q1_intent", "decline"}:
             continue
+        if not supports_volunteered_question(qid, text):
+            continue
         classification = classify_answer(question, text)
         if classification["status"] == PASS:
             volunteered[qid] = classification
     return volunteered
+
+
+def detect_correction(
+    text: str, questions: dict[str, Question], answers: dict[str, dict[str, Any]]
+) -> dict[str, Any] | None:
+    ntext = normalize(text)
+    if not _has_any_phrase(
+        ntext,
+        (
+            "actually",
+            "i was wrong",
+            "that was wrong",
+            "wait",
+            "correction",
+            "let me correct",
+            "sorry",
+            "i meant",
+        ),
+    ):
+        return None
+    for qid in reversed(list(answers)):
+        if qid not in questions or not supports_volunteered_question(qid, text):
+            continue
+        classification = classify_answer(questions[qid], text)
+        if classification["status"] == PASS:
+            return {
+                **classification,
+                "question_id": qid,
+                "previous_answer": {
+                    "scenario_id": answers[qid]["scenario_id"],
+                    "value": answers[qid]["value"],
+                    "evidence": answers[qid]["evidence"],
+                },
+            }
+        if classification["status"] == UNCERTAIN:
+            return {
+                "status": UNCERTAIN,
+                "question_id": qid,
+                "previous_answer": {
+                    "scenario_id": answers[qid]["scenario_id"],
+                    "value": answers[qid]["value"],
+                    "evidence": answers[qid]["evidence"],
+                },
+            }
+    return None
+
+
+def supports_volunteered_question(qid: str, text: str) -> bool:
+    ntext = normalize(text)
+    if ntext in {"yes", "yeah", "yep", "no", "nope"}:
+        return False
+    signals = {
+        "q2_active": ("active", "coverage", "covered", "medi cal", "medi-cal"),
+        "q3_coverage": (
+            "other insurance",
+            "other health insurance",
+            "other coverage",
+            "insurance through",
+            "covered by",
+            "kaiser",
+            "tricare",
+            "covered california",
+            "private plan",
+            "employer",
+            "work",
+            "school",
+        ),
+        "q3_plan": (
+            "kaiser",
+            "aetna",
+            "anthem",
+            "blue cross",
+            "health net",
+            "tricare",
+            "covered california",
+            "private plan",
+            "other plan",
+            "different plan",
+            "molina",
+            "sharp",
+            "uhc",
+            "cigna",
+            "humana",
+            "aarp",
+            "plan",
+        ),
+        "q4_residency": ("san diego", "county", "live", "reside", "moved"),
+        "q5_packet": ("packet", "yellow", "mailed", "submitted", "sent", "received", "lost"),
+        "q5_choice": ("phone", "appointment", "in person", "in-person", "finish", "complete", "renewal"),
+    }
+    return _has_any_phrase(ntext, signals.get(qid, (qid,)))
 
 
 def normalize(text: str) -> str:
@@ -430,16 +570,34 @@ def _classify_active(text: str) -> tuple[str | None, Any]:
         return "inactive", "Not active or unsure"
     if _has_negated_word(text, "active"):
         return "inactive", "Not active or unsure"
-    if _has_any_phrase(text, ("definitely have active", "have active", "active coverage", "still covered", "definitely still covered")):
+    if _has_any_phrase(text, ("definitely have active", "have active", "active coverage", "medi cal is active", "is active", "still covered", "definitely still covered")):
         return "active", "Active"
     return None, None
 
 
 def _classify_coverage(text: str) -> tuple[str | None, Any]:
-    plans = ("kaiser", "tricare", "covered california", "private plan", "work", "school")
-    if _has_any_phrase(text, ("no other", "don t have any other", "do not have any other", "no health insurance", "no insurance")):
+    all_coverage_denials = (
+        "no other",
+        "don t have any other",
+        "do not have any other",
+        "no other health insurance",
+        "no other insurance",
+        "no health insurance",
+        "no insurance",
+    )
+    if _has_any_phrase(text, all_coverage_denials):
         return "false", False
-    if any(_word_or_phrase(text, plan) for plan in plans):
+    carrier_plans = ("kaiser", "tricare", "covered california", "private plan")
+    if any(_word_or_phrase(text, plan) and not _has_negated_word(text, plan.split()[0]) for plan in carrier_plans):
+        return "true", True
+    if (
+        _has_any_phrase(text, ("insurance through work", "through work", "through my employer", "through employer", "through my job"))
+        and not _has_negated_word(text, "work")
+        and not _has_negated_word(text, "employer")
+        and not _has_negated_word(text, "job")
+    ):
+        return "true", True
+    if _has_any_phrase(text, ("insurance through school", "through school")) and not _has_negated_word(text, "school"):
         return "true", True
     return None, None
 

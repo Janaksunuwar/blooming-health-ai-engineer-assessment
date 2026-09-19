@@ -40,7 +40,9 @@ The answer key and full-events files are interviewer-side artifacts and are not 
 
 ## Optional Captured Fields
 
-When claimed captured fields are available, pass:
+The original assessment describes claimed captured-field values, but the included ten-conversation dataset does not contain them. When a reviewer or caller system has claimed captured fields, save them as a separate JSON file and pass that file with `--captured-fields`.
+
+For example, if the reviewer supplies `q3/data/captured_fields.json`, run:
 
 ```bash
 python3 q3/run.py \
@@ -48,6 +50,8 @@ python3 q3/run.py \
   --captured-fields q3/data/captured_fields.json \
   --output q3/results.json
 ```
+
+No `q3/data/captured_fields.json` file is included in this repository; the path above is a user-supplied input example, not part of the original submitted dataset.
 
 Expected captured-fields shape:
 
