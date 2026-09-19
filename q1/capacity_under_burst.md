@@ -17,7 +17,7 @@ The offered load is:
 
 Assumption: every outbound call is answered immediately, every call lasts exactly 40 minutes, and starts are uniformly distributed across the 30-minute launch window. Under that simplified upper bound, active concurrency rises throughout the launch period because the first calls have only been active for 30 minutes, so none have completed yet.
 
-Under these simplifying assumptions, concurrency reaches 10,000 active sessions at minute 30. This is a conservative planning scenario for the original 10,000 calls, not a measured production peak. Actual concurrency depends on answer rates, ringing time, the call-duration distribution, retries, and the scheduling pattern.
+Under these simplifying assumptions, concurrency reaches 10,000 active sessions at minute 30. Under the uniform-arrival assumption, this is not a momentary spike: concurrency holds at 10,000 for roughly the following 10 minutes, until the first calls (started at minute 0, running 40 minutes) begin completing at minute 40. Provisioning should target this as a sustained peak, not an instantaneous one. This is a conservative planning scenario for the original 10,000 calls, not a measured production peak. Actual concurrency depends on answer rates, ringing time, the call-duration distribution, retries, and the scheduling pattern.
 
 ## Measurements Needed Before Final Sizing
 
@@ -32,6 +32,7 @@ I would not pick a GCP machine type or calls-per-worker number from vCPU counts 
 | Answer rate and duration distribution | Use campaign and telephony data to estimate active concurrency from initiated calls. |
 | Network and WebSocket behavior | Measure bandwidth, jitter, packet loss, reconnects, and stability to separate network from CPU problems. |
 | Model API limits and latency | Validate provider concurrency, rate limits, quota, throttling, and response latency under load. |
+| Telephony-leg limits | Check Twilio account concurrency and calls-per-second limits, and per-number carrier throttling / STIR-SHAKEN flagging risk at this call volume — a limit increase or a larger outbound number pool may be needed before compute sizing is even the binding constraint. |
 | GCP instance behavior | Benchmark candidate instance families with the real audio stack; theoretical vCPU counts are not enough. |
 
 ## Architecture Approach
@@ -40,7 +41,7 @@ The scheduler should admit new calls based on safe session capacity, audio-quali
 
 Each active call should be assigned to a stateful worker that owns the persistent model WebSocket and in-process audio pipeline for the lifetime of the call. I would not assume an active session can be migrated seamlessly. Deployments and scale-down should drain workers by letting existing calls finish while routing new calls elsewhere.
 
-On GCP, I would use compute appropriate for long-lived CPU-bound workloads with explicit CPU and memory allocation, per-worker session limits, and reserved headroom. The platform and machine family should come from benchmarks. Whether this runs on GKE, managed instance groups, or another compute option, each worker should advertise safe session slots for the scheduler to consume.
+On GCP, I would use compute appropriate for long-lived CPU-bound workloads with explicit CPU and memory allocation, per-worker session limits, and reserved headroom. The concrete trap to avoid is shared-core machine types (e.g., E2), where CPU scheduling contention across tenants on oversubscribed physical cores can throttle a call's DSP work in a way that looks identical to the failure mode being diagnosed here. I would prefer dedicated-core families (N2, C2, C2D) for this workload and explicitly benchmark for CPU steal under realistic concurrent load, not just nominal vCPU count. The platform and machine family should come from benchmarks. Whether this runs on GKE, managed instance groups, or another compute option, each worker should advertise safe session slots for the scheduler to consume. This needs a purpose-built control plane rather than an off-the-shelf load balancer — standard GCP HTTP(S)/network load balancers don't do quality-aware, stateful-session admission on their own. In practice this looks like a capacity ledger or a dial-request queue that worker pools pull from at a governed rate, gated by the live quality signals described above.
 
 Each worker should enforce a hard session admission limit derived from the measured audio-quality saturation point, with additional headroom for variability in speech activity and CPU scheduling. The scheduler should allocate calls only to workers with available safe session slots. Autoscaling can add capacity, but it should not override the per-worker admission limit.
 
@@ -51,6 +52,8 @@ Scaling should be planned ahead of the campaign. Reactive autoscaling that start
 CPU contention can break audio without crashing the server. Audio frames arrive continuously, and noise suppression and VAD consume CPU on each stream. If too many sessions compete for CPU, frames wait in queues or are scheduled late. The process still runs, sockets stay open, and health checks pass, but the caller hears gaps, clipping, or delayed turn-taking.
 
 I would instrument per-session audio latency, deadline misses, queue depth, underruns, dropped or late frames, end-to-end response latency, and network jitter/loss. I would separately measure model-provider latency and throttling. Local choppiness from CPU contention requires lower session density; slow model responses may require provider quota changes.
+
+Given that the stack is Python and Go, the leading hypothesis for this specific failure mode is the GIL. If per-call noise suppression and VAD run as pure-Python or non-GIL-releasing code inside the same asyncio process handling many concurrent calls, that work serializes across every call in the process regardless of core count — more concurrent connections do not buy multi-core scaling, they buy exactly the symptom described in the prompt: audio quality degrading while the process stays healthy and keeps accepting sockets. I would treat this as a testable hypothesis and check it first, before assuming the bottleneck is raw CPU capacity. The fix, if confirmed, is native or GIL-releasing DSP libraries, per-call multiprocessing, or offloading the DSP stage to Go, which the stack already has available for this purpose.
 
 ## Load Testing and Capacity Formula
 
