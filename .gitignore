@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+*credentials*
+*credential*
+*secret*
+*secrets*
+*api_key*
+*apikey*
+
+# Temporary files
+.DS_Store
+*.tmp
+*.temp
+*.log
+tmp/
+temp/
+
+# Generated evaluation output
+reports/
+evaluation_reports/
+eval_reports/
+results/
+outputs/
+artifacts/
+
+# Interviewer-only evaluation data and answer keys
+*ANSWER_KEY*
+*answer_key*
+*FULL_EVENTS*
+*full_events*
+interviewer_only/
+interviewer-only/
