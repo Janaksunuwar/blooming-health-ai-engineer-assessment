@@ -2,7 +2,7 @@
 
 ## Problem Framing
 
-A 130-question Medicaid renewal call should not rely on accumulated audio-native history as authoritative memory. By minute 35, the model may still be fluent while losing track of which questions were answered, which values were validated, and which branch is next.
+A 130-question Medicaid renewal call should not rely on accumulated audio-native history as authoritative memory. By minute 35, the model may still be fluent while losing track of which questions were answered, which values were validated, and which branch is next. The literal mechanism behind this is audio-token accumulation: because conversation history is audio-native, every turn re-attends over the entire growing audio record of the call, and audio tokens carry a far higher per-second cost than text tokens. This produces two measurable effects independent of any workflow-tracking bug — rising per-turn latency and cost as the call progresses, and degraded recall of early-call facts specifically because they sit deep in an ever-larger context (a "lost in the middle" effect), as distinct from recent facts the model still attends to well.
 
 The system must distinguish what the member said, what the model interpreted, what the application validated and persisted, and which question is authoritative. The model manages conversation; the controller owns application state.
 
@@ -16,7 +16,7 @@ An external workflow controller maintains the current question ID, applicable se
 
 An external answer store persists values, confirmation status, revisions, and evidence references.
 
-The communication pattern is transactional: the model proposes an answer or action, the controller validates it, the answer store commits it, and the controller explicitly authorizes the next question. Until that authorization arrives, the model should stay within the current question, clarification, and structured answer-submission task. The model may still advance verbally, so unexpected spoken transitions must be detected and corrected rather than accepted as workflow progress.
+The communication pattern is transactional: the model proposes an answer or action, the controller validates it, the answer store commits it, and the controller explicitly authorizes the next question. Until that authorization arrives, the model should stay within the current question, clarification, and structured answer-submission task. The model may still advance verbally, so unexpected spoken transitions must be detected and corrected rather than accepted as workflow progress. As a side effect of this separation, the design is also resilient to an unplanned socket drop: because the controller and answer store hold all validated state outside the model, an unexpected disconnect could be recovered by reseeding a new session's instructions from persisted state and resuming close to where the call left off, without reconstructing anything from the lost audio history.
 
 ## Model Context Versus External State
 
@@ -62,6 +62,8 @@ Semantic retrieval may help conversational texture, but it should not replace st
 
 ## What Breaks First
 
+There are two first-order failure modes here, not one, and they have different signatures. The first is inherent to the architecture the prompt describes — audio-native, append-only, ever-accumulating history — and would occur even with a perfectly correct controller: rising per-turn latency and cost as context grows, and degraded recall of early-call facts buried deep in that context. The second is a race condition in this design's own mechanics:
+
 The first likely failure is synchronization between the live conversation and external workflow state. In speech-to-speech systems, overlapping audio, barge-in, delayed extraction, duplicate events, out-of-order updates, and corrections can all cause divergence.
 
 Example: the member answers Q025. Before Q025 is validated and committed, the model begins asking Q026. The model now behaves as if the workflow advanced, but the controller still records Q025 as pending. Updating instructions alone cannot guarantee the model never verbally skips; the backend has to detect and repair it.
@@ -70,7 +72,7 @@ Safeguards include stable question IDs, explicit question-state transitions, con
 
 ## Detection and Recovery
 
-I would monitor both structured workflow events and observed conversation. Detection signals include expected versus observed question ID, invalid transitions, repeated confirmed questions, missing required answers, conflicting values, failed validations, time since last transition, and model actions rejected by the controller. Where synchronized transcripts or equivalent speech observations are available, associate agent utterances with expected question IDs. If the model verbally advances to Q026 while Q025 is unresolved, record the unauthorized transition, prevent further advancement, and guide the model back. Transcript uncertainty may require clarification or more evidence rather than automatically declaring a confirmed failure.
+I would monitor both structured workflow events and observed conversation. Detection signals include expected versus observed question ID, invalid transitions, repeated confirmed questions, missing required answers, conflicting values, failed validations, time since last transition, and model actions rejected by the controller. Separately, I would track session-health signals independent of workflow state: per-turn response latency over the course of the call, per-turn token/cost growth, and time-in-session — a rising latency trend correlated with call duration would indicate context-growth degradation is underway even when every workflow-state signal looks clean. Where synchronized transcripts or equivalent speech observations are available, associate agent utterances with expected question IDs. If the model verbally advances to Q026 while Q025 is unresolved, record the unauthorized transition, prevent further advancement, and guide the model back. Transcript uncertainty may require clarification or more evidence rather than automatically declaring a confirmed failure.
 
 On divergence, stop authoritative advancement, retrieve persisted state, identify the unresolved question, refresh current instructions, and ask for clarification only if needed. Continue over the existing WebSocket. If the controller can infer the repair, it can guide the model back naturally: "I want to make sure I captured that correctly before we move on."
 
