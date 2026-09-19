@@ -1,0 +1,1487 @@
+{
+  "evaluation_mode": "transcript_only",
+  "input_summary": {
+    "captured_fields_supplied": false,
+    "interviewer_artifacts_used": false,
+    "thread_count": 10
+  },
+  "results": [
+    {
+      "critical_failures": [],
+      "evaluation_mode": "transcript_only",
+      "expected_disposition": "medi_cal_active",
+      "field_accuracy_status": "NOT_EVALUATED",
+      "observed_disposition": "medi_cal_active",
+      "overall_status": "PASS",
+      "recommended_engineering_fixes": [
+        "Provide claimed captured fields to evaluate field accuracy."
+      ],
+      "supporting_evidence": {
+        "applicable_workflow_path": [
+          "q1_intent",
+          "q2_active"
+        ],
+        "asked_questions": [
+          "q1_intent",
+          "q2_active"
+        ],
+        "classified_answers": {
+          "q1_intent": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yes, please. I really need help getting that taken care of today.",
+              "turn": 0
+            },
+            "scenario_id": "yes",
+            "source": "asked_response",
+            "value": "Yes"
+          },
+          "q2_active": {
+            "evidence": {
+              "role": "caller",
+              "text": "Oh, that\u2019s weird. I definitely have active coverage right now, I just want to make sure I don't lose it.",
+              "turn": 1
+            },
+            "scenario_id": "active",
+            "source": "asked_response",
+            "value": "Active"
+          }
+        },
+        "observed_agent_behavior": [
+          {
+            "event": "asked_question",
+            "question_id": "q1_intent",
+            "turn": -1
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q2_active",
+            "turn": 0
+          },
+          {
+            "disposition": "medi_cal_active",
+            "event": "terminal_language",
+            "turn": 1
+          }
+        ],
+        "volunteered_information": {
+          "q2_active": {
+            "evidence": {
+              "role": "caller",
+              "text": "Oh, that\u2019s weird. I definitely have active coverage right now, I just want to make sure I don't lose it.",
+              "turn": 1
+            },
+            "scenario_id": "active",
+            "status": "PASS",
+            "value": "Active"
+          }
+        }
+      },
+      "task_completion_status": "PASS",
+      "thread_id": "thread_01",
+      "uncertainties": [
+        {
+          "code": "missing_captured_fields",
+          "message": "Captured-field input was not supplied."
+        }
+      ],
+      "warnings": [],
+      "workflow_status": "PASS"
+    },
+    {
+      "critical_failures": [],
+      "evaluation_mode": "transcript_only",
+      "expected_disposition": "complete_renewal",
+      "field_accuracy_status": "NOT_EVALUATED",
+      "observed_disposition": "complete_renewal",
+      "overall_status": "UNCERTAIN",
+      "recommended_engineering_fixes": [
+        "Provide claimed captured fields to evaluate field accuracy.",
+        "Confirm or persist volunteered information before relying on it for workflow progression."
+      ],
+      "supporting_evidence": {
+        "applicable_workflow_path": [
+          "q1_intent",
+          "q2_active",
+          "q3_coverage",
+          "q4_residency",
+          "q5_packet"
+        ],
+        "asked_questions": [
+          "q1_intent",
+          "q2_active",
+          "q3_coverage",
+          "q4_residency",
+          "q5_packet"
+        ],
+        "classified_answers": {
+          "q1_intent": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yes, please, I definitely need help with that.",
+              "turn": 0
+            },
+            "scenario_id": "yes",
+            "source": "asked_response",
+            "value": "Yes"
+          },
+          "q2_active": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, I don't think it's active right now, which is why I\u2019m calling.",
+              "turn": 1
+            },
+            "scenario_id": "inactive",
+            "source": "asked_response",
+            "value": "Not active or unsure"
+          },
+          "q3_coverage": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, I don't have any other insurance at all.",
+              "turn": 2
+            },
+            "scenario_id": "false",
+            "source": "asked_response",
+            "value": false
+          },
+          "q4_residency": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yeah, I still live here in San Diego. I really need help getting my coverage sorted out since I never actually got that yellow renewal packet in the mail.",
+              "turn": 3
+            },
+            "scenario_id": "true",
+            "source": "asked_response",
+            "value": true
+          },
+          "q5_packet": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, I never actually got it in the mail, so I don't have it. Can we just go ahead and do the renewal now?",
+              "turn": 4
+            },
+            "scenario_id": "no_or_lost",
+            "source": "asked_response",
+            "value": "No or lost it"
+          }
+        },
+        "observed_agent_behavior": [
+          {
+            "event": "asked_question",
+            "question_id": "q1_intent",
+            "turn": -1
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q2_active",
+            "turn": 0
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q3_coverage",
+            "turn": 1
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q4_residency",
+            "turn": 2
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q5_packet",
+            "turn": 3
+          },
+          {
+            "disposition": "complete_renewal",
+            "event": "terminal_language",
+            "turn": 4
+          }
+        ],
+        "volunteered_information": {
+          "q2_active": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, I don't think it's active right now, which is why I\u2019m calling.",
+              "turn": 1
+            },
+            "scenario_id": "inactive",
+            "status": "PASS",
+            "value": "Not active or unsure"
+          },
+          "q3_coverage": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, I don't have any other insurance at all.",
+              "turn": 2
+            },
+            "scenario_id": "false",
+            "status": "PASS",
+            "value": false
+          },
+          "q4_residency": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yeah, I still live here in San Diego. I really need help getting my coverage sorted out since I never actually got that yellow renewal packet in the mail.",
+              "turn": 3
+            },
+            "scenario_id": "true",
+            "status": "PASS",
+            "value": true
+          },
+          "q5_packet": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yeah, I still live here in San Diego. I really need help getting my coverage sorted out since I never actually got that yellow renewal packet in the mail.",
+              "turn": 3
+            },
+            "scenario_id": "no_or_lost",
+            "status": "PASS",
+            "value": "No or lost it"
+          }
+        }
+      },
+      "task_completion_status": "UNCERTAIN",
+      "thread_id": "thread_02",
+      "uncertainties": [
+        {
+          "code": "missing_captured_fields",
+          "message": "Captured-field input was not supplied."
+        }
+      ],
+      "warnings": [
+        {
+          "code": "volunteered_answer_needs_confirmation",
+          "evidence": {
+            "role": "caller",
+            "text": "Yeah, I still live here in San Diego. I really need help getting my coverage sorted out since I never actually got that yellow renewal packet in the mail.",
+            "turn": 3
+          },
+          "message": "Caller volunteered an answer to q5_packet before the agent asked it.",
+          "question_id": "q5_packet"
+        }
+      ],
+      "workflow_status": "PASS"
+    },
+    {
+      "critical_failures": [],
+      "evaluation_mode": "transcript_only",
+      "expected_disposition": "escalated_chw_out_of_county",
+      "field_accuracy_status": "NOT_EVALUATED",
+      "observed_disposition": "escalated_chw_out_of_county",
+      "overall_status": "PASS",
+      "recommended_engineering_fixes": [
+        "Provide claimed captured fields to evaluate field accuracy.",
+        "Confirm or persist volunteered information before relying on it for workflow progression."
+      ],
+      "supporting_evidence": {
+        "applicable_workflow_path": [
+          "q1_intent",
+          "q2_active",
+          "q3_coverage",
+          "q4_residency"
+        ],
+        "asked_questions": [
+          "q1_intent",
+          "q2_active",
+          "q3_coverage",
+          "q4_residency"
+        ],
+        "classified_answers": {
+          "q1_intent": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yeah, I\u2019d definitely like some help with that. My Medi-Cal isn\u2019t active right now and I don't have any other insurance.",
+              "turn": 0
+            },
+            "scenario_id": "yes",
+            "source": "asked_response",
+            "value": "Yes"
+          },
+          "q2_active": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, it's definitely not active, and I don't have any other insurance either. Also, I should let you know that I moved out of San Diego County to a different county recently.",
+              "turn": 1
+            },
+            "scenario_id": "inactive",
+            "source": "asked_response",
+            "value": "Not active or unsure"
+          },
+          "q3_coverage": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, I don't have any other insurance at all. Since I'm not in San Diego anymore, can you set me up with a community health worker to help me figure out my coverage in this new county?",
+              "turn": 2
+            },
+            "scenario_id": "false",
+            "source": "asked_response",
+            "value": false
+          },
+          "q4_residency": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, I actually moved out of the county, so I'm not in San Diego anymore. Can you please have a community health worker reach out to help me with the transition? [GOAL_ACHIEVED]",
+              "turn": 3
+            },
+            "scenario_id": "false",
+            "source": "asked_response",
+            "value": false
+          }
+        },
+        "observed_agent_behavior": [
+          {
+            "event": "asked_question",
+            "question_id": "q1_intent",
+            "turn": -1
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q2_active",
+            "turn": 0
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q3_coverage",
+            "turn": 1
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q4_residency",
+            "turn": 2
+          },
+          {
+            "disposition": "escalated_chw_out_of_county",
+            "event": "terminal_language",
+            "turn": 3
+          }
+        ],
+        "volunteered_information": {
+          "q2_active": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yeah, I\u2019d definitely like some help with that. My Medi-Cal isn\u2019t active right now and I don't have any other insurance.",
+              "turn": 0
+            },
+            "scenario_id": "inactive",
+            "status": "PASS",
+            "value": "Not active or unsure"
+          },
+          "q3_coverage": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yeah, I\u2019d definitely like some help with that. My Medi-Cal isn\u2019t active right now and I don't have any other insurance.",
+              "turn": 0
+            },
+            "scenario_id": "false",
+            "status": "PASS",
+            "value": false
+          },
+          "q4_residency": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, it's definitely not active, and I don't have any other insurance either. Also, I should let you know that I moved out of San Diego County to a different county recently.",
+              "turn": 1
+            },
+            "scenario_id": "false",
+            "status": "PASS",
+            "value": false
+          }
+        }
+      },
+      "task_completion_status": "PASS",
+      "thread_id": "thread_03",
+      "uncertainties": [
+        {
+          "code": "missing_captured_fields",
+          "message": "Captured-field input was not supplied."
+        }
+      ],
+      "warnings": [
+        {
+          "code": "volunteered_answer_needs_confirmation",
+          "evidence": {
+            "role": "caller",
+            "text": "Yeah, I\u2019d definitely like some help with that. My Medi-Cal isn\u2019t active right now and I don't have any other insurance.",
+            "turn": 0
+          },
+          "message": "Caller volunteered an answer to q2_active before the agent asked it.",
+          "question_id": "q2_active"
+        },
+        {
+          "code": "volunteered_answer_needs_confirmation",
+          "evidence": {
+            "role": "caller",
+            "text": "Yeah, I\u2019d definitely like some help with that. My Medi-Cal isn\u2019t active right now and I don't have any other insurance.",
+            "turn": 0
+          },
+          "message": "Caller volunteered an answer to q3_coverage before the agent asked it.",
+          "question_id": "q3_coverage"
+        },
+        {
+          "code": "volunteered_answer_needs_confirmation",
+          "evidence": {
+            "role": "caller",
+            "text": "No, it's definitely not active, and I don't have any other insurance either. Also, I should let you know that I moved out of San Diego County to a different county recently.",
+            "turn": 1
+          },
+          "message": "Caller volunteered an answer to q4_residency before the agent asked it.",
+          "question_id": "q4_residency"
+        }
+      ],
+      "workflow_status": "PASS"
+    },
+    {
+      "critical_failures": [],
+      "evaluation_mode": "transcript_only",
+      "expected_disposition": "medi_cal_active",
+      "field_accuracy_status": "NOT_EVALUATED",
+      "observed_disposition": "medi_cal_active",
+      "overall_status": "PASS",
+      "recommended_engineering_fixes": [
+        "Provide claimed captured fields to evaluate field accuracy."
+      ],
+      "supporting_evidence": {
+        "applicable_workflow_path": [
+          "q1_intent",
+          "q2_active"
+        ],
+        "asked_questions": [
+          "q1_intent",
+          "q2_active"
+        ],
+        "classified_answers": {
+          "q1_intent": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yes, please, I\u2019d really appreciate your help getting that renewed over the phone.",
+              "turn": 0
+            },
+            "scenario_id": "yes",
+            "source": "asked_response",
+            "value": "Yes"
+          },
+          "q2_active": {
+            "evidence": {
+              "role": "caller",
+              "text": "Oh, that's strange. I'm definitely still covered, I use it for my regular doctor visits all the time.",
+              "turn": 1
+            },
+            "scenario_id": "active",
+            "source": "asked_response",
+            "value": "Active"
+          }
+        },
+        "observed_agent_behavior": [
+          {
+            "event": "asked_question",
+            "question_id": "q1_intent",
+            "turn": -1
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q2_active",
+            "turn": 0
+          },
+          {
+            "disposition": "medi_cal_active",
+            "event": "terminal_language",
+            "turn": 2
+          }
+        ],
+        "volunteered_information": {
+          "q2_active": {
+            "evidence": {
+              "role": "caller",
+              "text": "Oh, that's strange. I'm definitely still covered, I use it for my regular doctor visits all the time.",
+              "turn": 1
+            },
+            "scenario_id": "active",
+            "status": "PASS",
+            "value": "Active"
+          },
+          "q5_choice": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yes, I\u2019m 100% sure it\u2019s active; I just used it for an appointment last week. Can we please get started with the renewal?",
+              "turn": 2
+            },
+            "scenario_id": "in_person",
+            "status": "PASS",
+            "value": "In-person appointment"
+          }
+        }
+      },
+      "task_completion_status": "PASS",
+      "thread_id": "thread_04",
+      "uncertainties": [
+        {
+          "code": "missing_captured_fields",
+          "message": "Captured-field input was not supplied."
+        }
+      ],
+      "warnings": [],
+      "workflow_status": "PASS"
+    },
+    {
+      "critical_failures": [],
+      "evaluation_mode": "transcript_only",
+      "expected_disposition": "escalated_chw_appointment",
+      "field_accuracy_status": "NOT_EVALUATED",
+      "observed_disposition": "escalated_chw_appointment",
+      "overall_status": "PASS",
+      "recommended_engineering_fixes": [
+        "Provide claimed captured fields to evaluate field accuracy.",
+        "Confirm or persist volunteered information before relying on it for workflow progression."
+      ],
+      "supporting_evidence": {
+        "applicable_workflow_path": [
+          "q1_intent",
+          "q2_active",
+          "q3_coverage",
+          "q4_residency",
+          "q5_packet",
+          "q5_choice"
+        ],
+        "asked_questions": [
+          "q1_intent",
+          "q2_active",
+          "q3_coverage",
+          "q4_residency",
+          "q5_packet",
+          "q5_choice"
+        ],
+        "classified_answers": {
+          "q1_intent": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yeah, I\u2019d definitely like some help with that.",
+              "turn": 0
+            },
+            "scenario_id": "yes",
+            "source": "asked_response",
+            "value": "Yes"
+          },
+          "q2_active": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, it's not active right now. I don't have any other insurance either.",
+              "turn": 1
+            },
+            "scenario_id": "inactive",
+            "source": "asked_response",
+            "value": "Not active or unsure"
+          },
+          "q3_coverage": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, I don't have any other insurance at all.",
+              "turn": 2
+            },
+            "scenario_id": "false",
+            "source": "asked_response",
+            "value": false
+          },
+          "q4_residency": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yeah, I still live here in San Diego.",
+              "turn": 3
+            },
+            "scenario_id": "true",
+            "source": "asked_response",
+            "value": true
+          },
+          "q5_choice": {
+            "evidence": {
+              "role": "caller",
+              "text": "I\u2019d definitely prefer to come in for an in-person appointment so I can go through it with someone. That sounds much better for me. [GOAL_ACHIEVED]",
+              "turn": 5
+            },
+            "scenario_id": "in_person",
+            "source": "asked_response",
+            "value": "In-person appointment"
+          },
+          "q5_packet": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yeah, I got it, and I still have it\u2014I haven't sent it in yet.",
+              "turn": 4
+            },
+            "scenario_id": "still_has",
+            "source": "asked_response",
+            "value": "Still have it"
+          }
+        },
+        "observed_agent_behavior": [
+          {
+            "event": "asked_question",
+            "question_id": "q1_intent",
+            "turn": -1
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q2_active",
+            "turn": 0
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q3_coverage",
+            "turn": 1
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q4_residency",
+            "turn": 2
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q5_packet",
+            "turn": 3
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q5_choice",
+            "turn": 4
+          },
+          {
+            "disposition": "escalated_chw_appointment",
+            "event": "terminal_language",
+            "turn": 5
+          }
+        ],
+        "volunteered_information": {
+          "q2_active": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, it's not active right now. I don't have any other insurance either.",
+              "turn": 1
+            },
+            "scenario_id": "inactive",
+            "status": "PASS",
+            "value": "Not active or unsure"
+          },
+          "q3_coverage": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, it's not active right now. I don't have any other insurance either.",
+              "turn": 1
+            },
+            "scenario_id": "false",
+            "status": "PASS",
+            "value": false
+          },
+          "q4_residency": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yeah, I still live here in San Diego.",
+              "turn": 3
+            },
+            "scenario_id": "true",
+            "status": "PASS",
+            "value": true
+          },
+          "q5_choice": {
+            "evidence": {
+              "role": "caller",
+              "text": "I\u2019d definitely prefer to come in for an in-person appointment so I can go through it with someone. That sounds much better for me. [GOAL_ACHIEVED]",
+              "turn": 5
+            },
+            "scenario_id": "in_person",
+            "status": "PASS",
+            "value": "In-person appointment"
+          },
+          "q5_packet": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yeah, I got it, and I still have it\u2014I haven't sent it in yet.",
+              "turn": 4
+            },
+            "scenario_id": "still_has",
+            "status": "PASS",
+            "value": "Still have it"
+          }
+        }
+      },
+      "task_completion_status": "PASS",
+      "thread_id": "thread_05",
+      "uncertainties": [
+        {
+          "code": "missing_captured_fields",
+          "message": "Captured-field input was not supplied."
+        }
+      ],
+      "warnings": [
+        {
+          "code": "volunteered_answer_needs_confirmation",
+          "evidence": {
+            "role": "caller",
+            "text": "No, it's not active right now. I don't have any other insurance either.",
+            "turn": 1
+          },
+          "message": "Caller volunteered an answer to q3_coverage before the agent asked it.",
+          "question_id": "q3_coverage"
+        }
+      ],
+      "workflow_status": "PASS"
+    },
+    {
+      "critical_failures": [],
+      "evaluation_mode": "transcript_only",
+      "expected_disposition": "escalated_chw_out_of_county",
+      "field_accuracy_status": "NOT_EVALUATED",
+      "observed_disposition": "escalated_chw_out_of_county",
+      "overall_status": "PASS",
+      "recommended_engineering_fixes": [
+        "Provide claimed captured fields to evaluate field accuracy."
+      ],
+      "supporting_evidence": {
+        "applicable_workflow_path": [
+          "q1_intent",
+          "decline"
+        ],
+        "asked_questions": [
+          "q1_intent",
+          "decline"
+        ],
+        "classified_answers": {
+          "decline": {
+            "evidence": {
+              "role": "caller",
+              "text": "Oh, I actually moved out of San Diego County recently, so I don't need the help here anymore.",
+              "turn": 1
+            },
+            "scenario_id": "reveals_out_of_county",
+            "source": "asked_response",
+            "value": "oh i actually moved out of san diego county recently so i don t need the help here anymore"
+          },
+          "q1_intent": {
+            "evidence": {
+              "role": "caller",
+              "text": "Actually, I'm not interested in renewing over the phone right now.",
+              "turn": 0
+            },
+            "scenario_id": "not_interested",
+            "source": "asked_response",
+            "value": "Not interested"
+          }
+        },
+        "observed_agent_behavior": [
+          {
+            "event": "asked_question",
+            "question_id": "q1_intent",
+            "turn": -1
+          },
+          {
+            "event": "asked_question",
+            "question_id": "decline",
+            "turn": 0
+          },
+          {
+            "disposition": "escalated_chw_out_of_county",
+            "event": "terminal_language",
+            "turn": 1
+          }
+        ],
+        "volunteered_information": {
+          "q4_residency": {
+            "evidence": {
+              "role": "caller",
+              "text": "Oh, I actually moved out of San Diego County recently, so I don't need the help here anymore.",
+              "turn": 1
+            },
+            "scenario_id": "false",
+            "status": "PASS",
+            "value": false
+          }
+        }
+      },
+      "task_completion_status": "PASS",
+      "thread_id": "thread_06",
+      "uncertainties": [
+        {
+          "code": "missing_captured_fields",
+          "message": "Captured-field input was not supplied."
+        }
+      ],
+      "warnings": [],
+      "workflow_status": "PASS"
+    },
+    {
+      "critical_failures": [],
+      "evaluation_mode": "transcript_only",
+      "expected_disposition": null,
+      "field_accuracy_status": "NOT_EVALUATED",
+      "observed_disposition": null,
+      "overall_status": "UNCERTAIN",
+      "recommended_engineering_fixes": [
+        "Provide claimed captured fields to evaluate field accuracy.",
+        "Confirm or persist volunteered information before relying on it for workflow progression."
+      ],
+      "supporting_evidence": {
+        "applicable_workflow_path": [
+          "q1_intent",
+          "q2_active",
+          "q3_coverage",
+          "q4_residency",
+          "q5_packet",
+          "q5_choice"
+        ],
+        "asked_questions": [
+          "q1_intent",
+          "q2_active",
+          "q3_coverage",
+          "q4_residency",
+          "q5_packet",
+          "q5_choice"
+        ],
+        "classified_answers": {
+          "q1_intent": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yes, I'd really appreciate your help with that.",
+              "turn": 0
+            },
+            "scenario_id": "yes",
+            "source": "asked_response",
+            "value": "Yes"
+          },
+          "q2_active": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, it\u2019s not active right now. I don't have any other insurance either.",
+              "turn": 1
+            },
+            "scenario_id": "inactive",
+            "source": "asked_response",
+            "value": "Not active or unsure"
+          },
+          "q3_coverage": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, I don't have any other insurance. I'm still living in San Diego County and I still have that yellow packet here with me.",
+              "turn": 2
+            },
+            "scenario_id": "false",
+            "source": "asked_response",
+            "value": false
+          },
+          "q4_residency": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yeah, I'm still in San Diego County. Definitely need some help getting this sorted out\u2014can we just finish that yellow packet over the phone right now?",
+              "turn": 3
+            },
+            "scenario_id": "true",
+            "source": "asked_response",
+            "value": true
+          },
+          "q5_packet": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yeah, I still have it right here in front of me. Can we just go ahead and finish it over the phone now? [GOAL_ACHIEVED]",
+              "turn": 4
+            },
+            "scenario_id": "still_has",
+            "source": "asked_response",
+            "value": "Still have it"
+          }
+        },
+        "observed_agent_behavior": [
+          {
+            "event": "asked_question",
+            "question_id": "q1_intent",
+            "turn": -1
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q2_active",
+            "turn": 0
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q3_coverage",
+            "turn": 1
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q4_residency",
+            "turn": 2
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q5_packet",
+            "turn": 3
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q5_choice",
+            "turn": 4
+          }
+        ],
+        "volunteered_information": {
+          "q2_active": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, it\u2019s not active right now. I don't have any other insurance either.",
+              "turn": 1
+            },
+            "scenario_id": "inactive",
+            "status": "PASS",
+            "value": "Not active or unsure"
+          },
+          "q3_coverage": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, it\u2019s not active right now. I don't have any other insurance either.",
+              "turn": 1
+            },
+            "scenario_id": "false",
+            "status": "PASS",
+            "value": false
+          },
+          "q4_residency": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yeah, I'm still in San Diego County. Definitely need some help getting this sorted out\u2014can we just finish that yellow packet over the phone right now?",
+              "turn": 3
+            },
+            "scenario_id": "true",
+            "status": "PASS",
+            "value": true
+          },
+          "q5_choice": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yeah, I'm still in San Diego County. Definitely need some help getting this sorted out\u2014can we just finish that yellow packet over the phone right now?",
+              "turn": 3
+            },
+            "scenario_id": "by_phone",
+            "status": "PASS",
+            "value": "Complete by phone now"
+          },
+          "q5_packet": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, I don't have any other insurance. I'm still living in San Diego County and I still have that yellow packet here with me.",
+              "turn": 2
+            },
+            "scenario_id": "still_has",
+            "status": "PASS",
+            "value": "Still have it"
+          }
+        }
+      },
+      "task_completion_status": "UNCERTAIN",
+      "thread_id": "thread_07",
+      "uncertainties": [
+        {
+          "code": "missing_captured_fields",
+          "message": "Captured-field input was not supplied."
+        },
+        {
+          "code": "missing_terminal_evidence",
+          "message": "No terminal disposition was observed."
+        }
+      ],
+      "warnings": [
+        {
+          "code": "volunteered_answer_needs_confirmation",
+          "evidence": {
+            "role": "caller",
+            "text": "No, it\u2019s not active right now. I don't have any other insurance either.",
+            "turn": 1
+          },
+          "message": "Caller volunteered an answer to q3_coverage before the agent asked it.",
+          "question_id": "q3_coverage"
+        },
+        {
+          "code": "volunteered_answer_needs_confirmation",
+          "evidence": {
+            "role": "caller",
+            "text": "No, I don't have any other insurance. I'm still living in San Diego County and I still have that yellow packet here with me.",
+            "turn": 2
+          },
+          "message": "Caller volunteered an answer to q5_packet before the agent asked it.",
+          "question_id": "q5_packet"
+        },
+        {
+          "code": "volunteered_answer_needs_confirmation",
+          "evidence": {
+            "role": "caller",
+            "text": "Yeah, I'm still in San Diego County. Definitely need some help getting this sorted out\u2014can we just finish that yellow packet over the phone right now?",
+            "turn": 3
+          },
+          "message": "Caller volunteered an answer to q5_choice before the agent asked it.",
+          "question_id": "q5_choice"
+        }
+      ],
+      "workflow_status": "UNCERTAIN"
+    },
+    {
+      "critical_failures": [],
+      "evaluation_mode": "transcript_only",
+      "expected_disposition": "complete_renewal",
+      "field_accuracy_status": "NOT_EVALUATED",
+      "observed_disposition": "complete_renewal",
+      "overall_status": "UNCERTAIN",
+      "recommended_engineering_fixes": [
+        "Provide claimed captured fields to evaluate field accuracy.",
+        "Confirm or persist volunteered information before relying on it for workflow progression."
+      ],
+      "supporting_evidence": {
+        "applicable_workflow_path": [
+          "q1_intent",
+          "q2_active",
+          "q3_coverage",
+          "q4_residency",
+          "q5_packet"
+        ],
+        "asked_questions": [
+          "q1_intent",
+          "q2_active",
+          "q3_coverage",
+          "q4_residency",
+          "q5_packet"
+        ],
+        "classified_answers": {
+          "q1_intent": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yes, I definitely want help with that. I'm still living in San Diego County, but I haven't seen a yellow packet come in the mail at all.",
+              "turn": 0
+            },
+            "scenario_id": "yes",
+            "source": "asked_response",
+            "value": "Yes"
+          },
+          "q2_active": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, it\u2019s not active right now. I don't have any other insurance either, so I\u2019m really hoping to get this sorted out with you.",
+              "turn": 1
+            },
+            "scenario_id": "inactive",
+            "source": "asked_response",
+            "value": "Not active or unsure"
+          },
+          "q3_coverage": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, I don't have any other insurance at all.",
+              "turn": 2
+            },
+            "scenario_id": "false",
+            "source": "asked_response",
+            "value": false
+          },
+          "q4_residency": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yeah, I still live here in San Diego. I've been waiting for that yellow renewal packet to come in the mail, but I honestly never received it.",
+              "turn": 3
+            },
+            "scenario_id": "true",
+            "source": "asked_response",
+            "value": true
+          },
+          "q5_packet": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, like I said, I never got it in the mail. I definitely need some help getting this renewed so I don't lose my coverage.",
+              "turn": 4
+            },
+            "scenario_id": "no_or_lost",
+            "source": "asked_response",
+            "value": "No or lost it"
+          }
+        },
+        "observed_agent_behavior": [
+          {
+            "event": "asked_question",
+            "question_id": "q1_intent",
+            "turn": -1
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q2_active",
+            "turn": 0
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q3_coverage",
+            "turn": 1
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q4_residency",
+            "turn": 2
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q5_packet",
+            "turn": 3
+          },
+          {
+            "disposition": "complete_renewal",
+            "event": "terminal_language",
+            "turn": 4
+          }
+        ],
+        "volunteered_information": {
+          "q2_active": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, it\u2019s not active right now. I don't have any other insurance either, so I\u2019m really hoping to get this sorted out with you.",
+              "turn": 1
+            },
+            "scenario_id": "inactive",
+            "status": "PASS",
+            "value": "Not active or unsure"
+          },
+          "q3_coverage": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, it\u2019s not active right now. I don't have any other insurance either, so I\u2019m really hoping to get this sorted out with you.",
+              "turn": 1
+            },
+            "scenario_id": "false",
+            "status": "PASS",
+            "value": false
+          },
+          "q4_residency": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yeah, I still live here in San Diego. I've been waiting for that yellow renewal packet to come in the mail, but I honestly never received it.",
+              "turn": 3
+            },
+            "scenario_id": "true",
+            "status": "PASS",
+            "value": true
+          },
+          "q5_packet": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yeah, I still live here in San Diego. I've been waiting for that yellow renewal packet to come in the mail, but I honestly never received it.",
+              "turn": 3
+            },
+            "scenario_id": "no_or_lost",
+            "status": "PASS",
+            "value": "No or lost it"
+          }
+        }
+      },
+      "task_completion_status": "UNCERTAIN",
+      "thread_id": "thread_08",
+      "uncertainties": [
+        {
+          "code": "missing_captured_fields",
+          "message": "Captured-field input was not supplied."
+        }
+      ],
+      "warnings": [
+        {
+          "code": "volunteered_answer_needs_confirmation",
+          "evidence": {
+            "role": "caller",
+            "text": "No, it\u2019s not active right now. I don't have any other insurance either, so I\u2019m really hoping to get this sorted out with you.",
+            "turn": 1
+          },
+          "message": "Caller volunteered an answer to q3_coverage before the agent asked it.",
+          "question_id": "q3_coverage"
+        },
+        {
+          "code": "volunteered_answer_needs_confirmation",
+          "evidence": {
+            "role": "caller",
+            "text": "Yeah, I still live here in San Diego. I've been waiting for that yellow renewal packet to come in the mail, but I honestly never received it.",
+            "turn": 3
+          },
+          "message": "Caller volunteered an answer to q5_packet before the agent asked it.",
+          "question_id": "q5_packet"
+        }
+      ],
+      "workflow_status": "PASS"
+    },
+    {
+      "critical_failures": [],
+      "evaluation_mode": "transcript_only",
+      "expected_disposition": null,
+      "field_accuracy_status": "NOT_EVALUATED",
+      "observed_disposition": null,
+      "overall_status": "UNCERTAIN",
+      "recommended_engineering_fixes": [
+        "Provide claimed captured fields to evaluate field accuracy.",
+        "Confirm or persist volunteered information before relying on it for workflow progression."
+      ],
+      "supporting_evidence": {
+        "applicable_workflow_path": [
+          "q1_intent",
+          "q2_active",
+          "q3_coverage",
+          "q3_plan"
+        ],
+        "asked_questions": [
+          "q1_intent",
+          "q2_active",
+          "q3_coverage",
+          "q3_plan"
+        ],
+        "classified_answers": {
+          "q1_intent": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yeah, I'd really like some help with that. Actually, my Medi-Cal isn't active right now, and I'm currently covered through Kaiser Permanente.",
+              "turn": 0
+            },
+            "scenario_id": "yes",
+            "source": "asked_response",
+            "value": "Yes"
+          },
+          "q2_active": {
+            "evidence": {
+              "role": "caller",
+              "text": "No, it\u2019s definitely not active, but I do have Kaiser Permanente insurance right now.",
+              "turn": 1
+            },
+            "scenario_id": "inactive",
+            "source": "asked_response",
+            "value": "Not active or unsure"
+          },
+          "q3_coverage": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yeah, like I said, I'm covered by Kaiser Permanente. That\u2019s the only other insurance I have. [GOAL_ACHIEVED]",
+              "turn": 2
+            },
+            "scenario_id": "true",
+            "source": "asked_response",
+            "value": true
+          }
+        },
+        "observed_agent_behavior": [
+          {
+            "event": "asked_question",
+            "question_id": "q1_intent",
+            "turn": -1
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q2_active",
+            "turn": 0
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q3_coverage",
+            "turn": 1
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q3_plan",
+            "turn": 2
+          }
+        ],
+        "volunteered_information": {
+          "q2_active": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yeah, I'd really like some help with that. Actually, my Medi-Cal isn't active right now, and I'm currently covered through Kaiser Permanente.",
+              "turn": 0
+            },
+            "scenario_id": "inactive",
+            "status": "PASS",
+            "value": "Not active or unsure"
+          },
+          "q3_coverage": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yeah, I'd really like some help with that. Actually, my Medi-Cal isn't active right now, and I'm currently covered through Kaiser Permanente.",
+              "turn": 0
+            },
+            "scenario_id": "true",
+            "status": "PASS",
+            "value": true
+          },
+          "q3_plan": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yeah, I'd really like some help with that. Actually, my Medi-Cal isn't active right now, and I'm currently covered through Kaiser Permanente.",
+              "turn": 0
+            },
+            "scenario_id": "__close__",
+            "status": "PASS",
+            "value": "Kaiser Permanente"
+          }
+        }
+      },
+      "task_completion_status": "UNCERTAIN",
+      "thread_id": "thread_09",
+      "uncertainties": [
+        {
+          "code": "missing_captured_fields",
+          "message": "Captured-field input was not supplied."
+        },
+        {
+          "code": "missing_terminal_evidence",
+          "message": "No terminal disposition was observed."
+        }
+      ],
+      "warnings": [
+        {
+          "code": "volunteered_answer_needs_confirmation",
+          "evidence": {
+            "role": "caller",
+            "text": "Yeah, I'd really like some help with that. Actually, my Medi-Cal isn't active right now, and I'm currently covered through Kaiser Permanente.",
+            "turn": 0
+          },
+          "message": "Caller volunteered an answer to q2_active before the agent asked it.",
+          "question_id": "q2_active"
+        },
+        {
+          "code": "volunteered_answer_needs_confirmation",
+          "evidence": {
+            "role": "caller",
+            "text": "Yeah, I'd really like some help with that. Actually, my Medi-Cal isn't active right now, and I'm currently covered through Kaiser Permanente.",
+            "turn": 0
+          },
+          "message": "Caller volunteered an answer to q3_coverage before the agent asked it.",
+          "question_id": "q3_coverage"
+        },
+        {
+          "code": "volunteered_answer_needs_confirmation",
+          "evidence": {
+            "role": "caller",
+            "text": "Yeah, I'd really like some help with that. Actually, my Medi-Cal isn't active right now, and I'm currently covered through Kaiser Permanente.",
+            "turn": 0
+          },
+          "message": "Caller volunteered an answer to q3_plan before the agent asked it.",
+          "question_id": "q3_plan"
+        }
+      ],
+      "workflow_status": "UNCERTAIN"
+    },
+    {
+      "critical_failures": [],
+      "evaluation_mode": "transcript_only",
+      "expected_disposition": null,
+      "field_accuracy_status": "NOT_EVALUATED",
+      "observed_disposition": null,
+      "overall_status": "UNCERTAIN",
+      "recommended_engineering_fixes": [
+        "Provide claimed captured fields to evaluate field accuracy.",
+        "Confirm or persist volunteered information before relying on it for workflow progression."
+      ],
+      "supporting_evidence": {
+        "applicable_workflow_path": [
+          "q1_intent",
+          "q2_active"
+        ],
+        "asked_questions": [
+          "q1_intent",
+          "q2_active"
+        ],
+        "classified_answers": {
+          "q1_intent": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yes, I'd definitely like your help with that. I\u2019m not currently active, I don't have any other insurance, and I'm still in San Diego County. I have the yellow packet right here, so let's do this over the phone now. [GOAL_ACHIEVED]",
+              "turn": 0
+            },
+            "scenario_id": "yes",
+            "source": "asked_response",
+            "value": "Yes"
+          }
+        },
+        "observed_agent_behavior": [
+          {
+            "event": "asked_question",
+            "question_id": "q1_intent",
+            "turn": -1
+          },
+          {
+            "event": "asked_question",
+            "question_id": "q2_active",
+            "turn": 0
+          }
+        ],
+        "volunteered_information": {
+          "q2_active": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yes, I'd definitely like your help with that. I\u2019m not currently active, I don't have any other insurance, and I'm still in San Diego County. I have the yellow packet right here, so let's do this over the phone now. [GOAL_ACHIEVED]",
+              "turn": 0
+            },
+            "scenario_id": "inactive",
+            "status": "PASS",
+            "value": "Not active or unsure"
+          },
+          "q3_coverage": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yes, I'd definitely like your help with that. I\u2019m not currently active, I don't have any other insurance, and I'm still in San Diego County. I have the yellow packet right here, so let's do this over the phone now. [GOAL_ACHIEVED]",
+              "turn": 0
+            },
+            "scenario_id": "false",
+            "status": "PASS",
+            "value": false
+          },
+          "q4_residency": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yes, I'd definitely like your help with that. I\u2019m not currently active, I don't have any other insurance, and I'm still in San Diego County. I have the yellow packet right here, so let's do this over the phone now. [GOAL_ACHIEVED]",
+              "turn": 0
+            },
+            "scenario_id": "true",
+            "status": "PASS",
+            "value": true
+          },
+          "q5_choice": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yes, I'd definitely like your help with that. I\u2019m not currently active, I don't have any other insurance, and I'm still in San Diego County. I have the yellow packet right here, so let's do this over the phone now. [GOAL_ACHIEVED]",
+              "turn": 0
+            },
+            "scenario_id": "by_phone",
+            "status": "PASS",
+            "value": "Complete by phone now"
+          },
+          "q5_packet": {
+            "evidence": {
+              "role": "caller",
+              "text": "Yes, I'd definitely like your help with that. I\u2019m not currently active, I don't have any other insurance, and I'm still in San Diego County. I have the yellow packet right here, so let's do this over the phone now. [GOAL_ACHIEVED]",
+              "turn": 0
+            },
+            "scenario_id": "still_has",
+            "status": "PASS",
+            "value": "Still have it"
+          }
+        }
+      },
+      "task_completion_status": "UNCERTAIN",
+      "thread_id": "thread_10",
+      "uncertainties": [
+        {
+          "code": "missing_captured_fields",
+          "message": "Captured-field input was not supplied."
+        },
+        {
+          "code": "missing_terminal_evidence",
+          "message": "No terminal disposition was observed."
+        }
+      ],
+      "warnings": [
+        {
+          "code": "volunteered_answer_needs_confirmation",
+          "evidence": {
+            "role": "caller",
+            "text": "Yes, I'd definitely like your help with that. I\u2019m not currently active, I don't have any other insurance, and I'm still in San Diego County. I have the yellow packet right here, so let's do this over the phone now. [GOAL_ACHIEVED]",
+            "turn": 0
+          },
+          "message": "Caller volunteered an answer to q2_active before the agent asked it.",
+          "question_id": "q2_active"
+        }
+      ],
+      "workflow_status": "UNCERTAIN"
+    }
+  ]
+}
