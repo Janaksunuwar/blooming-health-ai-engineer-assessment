@@ -97,6 +97,7 @@
       "overall_status": "UNCERTAIN",
       "recommended_engineering_fixes": [
         "Provide claimed captured fields to evaluate field accuracy.",
+        "Supply downstream renewal or application-submission records to verify renewal completion.",
         "Confirm or persist volunteered information before relying on it for workflow progression."
       ],
       "supporting_evidence": {
@@ -247,6 +248,10 @@
         {
           "code": "missing_captured_fields",
           "message": "Captured-field input was not supplied."
+        },
+        {
+          "code": "renewal_execution_not_observed",
+          "message": "Agent reached the configured _complete route, where the agent itself should carry out the renewal. The transcript does not show the renewal being completed or submitted; downstream renewal or application-submission records are needed to verify task completion."
         }
       ],
       "warnings": [
@@ -499,16 +504,6 @@
             "scenario_id": "active",
             "status": "PASS",
             "value": "Active"
-          },
-          "q5_choice": {
-            "evidence": {
-              "role": "caller",
-              "text": "Yes, I\u2019m 100% sure it\u2019s active; I just used it for an appointment last week. Can we please get started with the renewal?",
-              "turn": 2
-            },
-            "scenario_id": "in_person",
-            "status": "PASS",
-            "value": "In-person appointment"
           }
         }
       },
@@ -1083,6 +1078,7 @@
       "overall_status": "UNCERTAIN",
       "recommended_engineering_fixes": [
         "Provide claimed captured fields to evaluate field accuracy.",
+        "Supply downstream renewal or application-submission records to verify renewal completion.",
         "Confirm or persist volunteered information before relying on it for workflow progression."
       ],
       "supporting_evidence": {
@@ -1233,6 +1229,10 @@
         {
           "code": "missing_captured_fields",
           "message": "Captured-field input was not supplied."
+        },
+        {
+          "code": "renewal_execution_not_observed",
+          "message": "Agent reached the configured _complete route, where the agent itself should carry out the renewal. The transcript does not show the renewal being completed or submitted; downstream renewal or application-submission records are needed to verify task completion."
         }
       ],
       "warnings": [
@@ -1260,13 +1260,51 @@
       "workflow_status": "PASS"
     },
     {
-      "critical_failures": [],
+      "critical_failures": [
+        {
+          "code": "leaked_internal_text",
+          "evidence": {
+            "role": "agent",
+            "text": "First \u2014 would you like our help renewing your Medi-Cal right now, over the phone? \n\n(Waiting for your answer.)",
+            "turn": -1
+          },
+          "message": "Agent turn contains leaked internal template text."
+        },
+        {
+          "code": "leaked_internal_text",
+          "evidence": {
+            "role": "agent",
+            "text": "Our records show your Medi-Cal may not be active right now. Can you confirm \u2014 do you currently have active Medi-Cal coverage? \n\n(Waiting for your answer.)",
+            "turn": 0
+          },
+          "message": "Agent turn contains leaked internal template text."
+        },
+        {
+          "code": "leaked_internal_text",
+          "evidence": {
+            "role": "agent",
+            "text": "Do you currently have any other health insurance \u2014 through work, school, Kaiser, TriCare, Covered California, or a private plan?\n\n(Waiting for your answer.)",
+            "turn": 1
+          },
+          "message": "Agent turn contains leaked internal template text."
+        },
+        {
+          "code": "leaked_internal_text",
+          "evidence": {
+            "role": "agent",
+            "text": "Got it, thanks \u2014 since you're already covered, there's nothing you need to do for Medi-Cal right now; just so we have it on file.\n\nWhich plan is that? \n\n(Waiting for your answer.)",
+            "turn": 2
+          },
+          "message": "Agent turn contains leaked internal template text."
+        }
+      ],
       "evaluation_mode": "transcript_only",
       "expected_disposition": null,
       "field_accuracy_status": "NOT_EVALUATED",
       "observed_disposition": null,
-      "overall_status": "UNCERTAIN",
+      "overall_status": "FAIL",
       "recommended_engineering_fixes": [
+        "Review template rendering \u2014 internal placeholder text should never reach agent output.",
         "Provide claimed captured fields to evaluate field accuracy.",
         "Confirm or persist volunteered information before relying on it for workflow progression."
       ],
@@ -1370,7 +1408,7 @@
           }
         }
       },
-      "task_completion_status": "UNCERTAIN",
+      "task_completion_status": "FAIL",
       "thread_id": "thread_09",
       "uncertainties": [
         {
@@ -1414,7 +1452,7 @@
           "question_id": "q3_plan"
         }
       ],
-      "workflow_status": "UNCERTAIN"
+      "workflow_status": "FAIL"
     },
     {
       "critical_failures": [

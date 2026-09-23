@@ -203,6 +203,15 @@ def evaluate_thread(
 
     if observed_disposition is None:
         uncertainties.append(_issue("missing_terminal_evidence", "No terminal disposition was observed."))
+    elif observed_disposition == "complete_renewal":
+        uncertainties.append(
+            _issue(
+                "renewal_execution_not_observed",
+                "Agent reached the configured _complete route, where the agent itself should carry out the renewal. "
+                "The transcript does not show the renewal being completed or submitted; downstream renewal or "
+                "application-submission records are needed to verify task completion.",
+            )
+        )
     applicable_path = applicable_workflow_path(questions, answers)
     field_status, field_issues, field_warnings, field_uncertainties = evaluate_captured_fields(
         captured_claims, questions, answers, applicable_path
@@ -424,7 +433,7 @@ def is_completion_language(text: str) -> bool:
 
 
 def has_leaked_internal_text(text: str) -> bool:
-    return "(waiting for your response.)" in text.lower()
+    return re.search(r"\(\s*waiting for your\b[^)]*\)", text.lower()) is not None
 
 
 def classify_answer(question: Question, text: str) -> dict[str, Any]:
@@ -652,7 +661,7 @@ def _classify_packet(text: str) -> tuple[str | None, Any]:
 def _classify_packet_choice(text: str) -> tuple[str | None, Any]:
     if _has_any_phrase(text, ("not interested", "don t want", "do not want", "no phone", "not by phone")):
         return None, None
-    if "in person" in text or "appointment" in text:
+    if "in person" in text or _requests_appointment(text):
         return "in_person", "In-person appointment"
     if _has_any_phrase(text, ("by phone", "over the phone", "on the phone")) and _has_any_phrase(
         text, ("complete", "finish", "do it", "do this", "renewal")
@@ -661,6 +670,14 @@ def _classify_packet_choice(text: str) -> tuple[str | None, Any]:
     if _has_any_phrase(text, ("finish it", "complete it")):
         return "by_phone", "Complete by phone now"
     return None, None
+
+
+def _requests_appointment(text: str) -> bool:
+    # A bare "appointment" can refer to an unrelated visit ("used it for an appointment last week").
+    return (
+        re.search(r"\b(want|prefer|like|rather|schedule|set up|book|make|go with)\b(?:\s+\w+){0,3}\s+appointment\b", text) is not None
+        or re.fullmatch(r"(an |the )?appointment( please)?", text) is not None
+    )
 
 
 def _classify_decline(text: str) -> tuple[str | None, Any]:
@@ -722,7 +739,7 @@ def _aggregate(workflow: str, fields: str, task: str, critical: list[dict[str, A
 def _task_status(critical: list[dict[str, Any]], uncertainties: list[dict[str, Any]], observed: str | None) -> str:
     if _workflow_failures(critical):
         return FAIL
-    if observed == "complete_renewal":
+    if any(issue["code"] == "renewal_execution_not_observed" for issue in uncertainties):
         return UNCERTAIN
     if observed is None or any(issue["code"] == "missing_terminal_evidence" for issue in uncertainties):
         return UNCERTAIN
@@ -734,7 +751,7 @@ def _workflow_failures(critical: list[dict[str, Any]]) -> bool:
 
 
 def _workflow_uncertainties(uncertainties: list[dict[str, Any]]) -> bool:
-    return any(issue["code"] != "missing_captured_fields" for issue in uncertainties)
+    return any(issue["code"] not in {"missing_captured_fields", "renewal_execution_not_observed"} for issue in uncertainties)
 
 
 def _issue(code: str, message: str, evidence: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -774,6 +791,8 @@ def _fixes(
         fixes.append("Review terminal-disposition selection against the configured workflow route.")
     if "missing_captured_fields" in codes:
         fixes.append("Provide claimed captured fields to evaluate field accuracy.")
+    if "renewal_execution_not_observed" in codes:
+        fixes.append("Supply downstream renewal or application-submission records to verify renewal completion.")
     if "ambiguous_caller_answer" in codes:
         fixes.append("Route ambiguous answers through clarification or semantic review.")
     if "captured_field_contradiction" in codes:

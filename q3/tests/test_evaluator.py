@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import copy
+import json
 import unittest
 import sys
 from pathlib import Path
@@ -655,6 +657,133 @@ class EvaluatorTest(unittest.TestCase):
             ]
         )
         self.assertTrue(any(issue["code"] == "leaked_internal_text" for issue in result["critical_failures"]))
+
+    def test_leaked_waiting_for_your_answer_variant_is_critical_failure(self):
+        # thread_09 in the supplied dataset uses this wording instead of "(Waiting for your response.)".
+        result = self.result(
+            [
+                msg(
+                    "agent",
+                    "First, would you like our help renewing your Medi-Cal right now, over the phone? \n\n(Waiting for your answer.)",
+                ),
+            ]
+        )
+        self.assertTrue(any(issue["code"] == "leaked_internal_text" for issue in result["critical_failures"]))
+        self.assertEqual(result["overall_status"], FAIL)
+
+    def test_parenthetical_prompt_without_waiting_placeholder_is_not_leak(self):
+        result = self.result(
+            [
+                msg(
+                    "agent",
+                    "First, would you like our help renewing your Medi-Cal right now, over the phone? (Please let me know your answer.)",
+                ),
+            ]
+        )
+        self.assertFalse(any(issue["code"] == "leaked_internal_text" for issue in result["critical_failures"]))
+
+    def test_complete_renewal_uncertainty_is_explained(self):
+        result = self.result(
+            [
+                msg("agent", "First, would you like our help renewing your Medi-Cal right now, over the phone?"),
+                msg("caller", "Yes."),
+                msg("agent", "Our records show your Medi-Cal may not be active right now. Can you confirm, do you currently have active Medi-Cal coverage?"),
+                msg("caller", "Not active."),
+                msg("agent", "Do you currently have any other health insurance through work, school, Kaiser, TriCare, Covered California, or a private plan?"),
+                msg("caller", "No other insurance."),
+                msg("agent", "Do you still live in San Diego County?"),
+                msg("caller", "Yeah, I still live here in San Diego."),
+                msg("agent", "Did you receive the yellow renewal packet from the county, and do you still have it?"),
+                msg("caller", "No, I never got it."),
+                msg("agent", "No problem, let's get your renewal started."),
+            ]
+        )
+        self.assertEqual(result["observed_disposition"], "complete_renewal")
+        self.assertTrue(any(issue["code"] == "renewal_execution_not_observed" for issue in result["uncertainties"]))
+        self.assertEqual(result["workflow_status"], PASS)
+        self.assertEqual(result["task_completion_status"], UNCERTAIN)
+        self.assertEqual(result["overall_status"], UNCERTAIN)
+
+    def test_handoff_disposition_has_no_renewal_execution_uncertainty(self):
+        result = self.result(
+            [
+                msg("agent", "First, would you like our help renewing your Medi-Cal right now, over the phone?"),
+                msg("caller", "Yes, please."),
+                msg("agent", "Our records show your Medi-Cal may not be active right now. Can you confirm, do you currently have active Medi-Cal coverage?"),
+                msg("caller", "I definitely have active coverage."),
+                msg("agent", "That's great news, there is nothing you need to do right now."),
+            ]
+        )
+        self.assertFalse(any(issue["code"] == "renewal_execution_not_observed" for issue in result["uncertainties"]))
+        self.assertEqual(result["task_completion_status"], PASS)
+
+    def test_past_appointment_mention_is_not_volunteered_in_person_choice(self):
+        # thread_04 in the supplied dataset: a past doctor visit is not a packet-choice preference.
+        result = self.result(
+            [
+                msg("agent", "First, would you like our help renewing your Medi-Cal right now, over the phone?"),
+                msg("caller", "Yes."),
+                msg("caller", "I'm 100% sure it's active; I just used it for an appointment last week. Can we please get started with the renewal?"),
+            ]
+        )
+        self.assertNotIn("q5_choice", result["supporting_evidence"]["volunteered_information"])
+
+    def test_requested_appointment_is_in_person_choice(self):
+        for answer in ("I'd prefer to come in for an in-person appointment.", "I'd like to set up an appointment."):
+            with self.subTest(answer=answer):
+                result = self.result(
+                    [
+                        msg("agent", "First, would you like our help renewing your Medi-Cal right now, over the phone?"),
+                        msg("caller", "Yes."),
+                        msg("agent", "Our records show your Medi-Cal may not be active right now. Can you confirm, do you currently have active Medi-Cal coverage?"),
+                        msg("caller", "Not active."),
+                        msg("agent", "Do you currently have any other health insurance through work, school, Kaiser, TriCare, Covered California, or a private plan?"),
+                        msg("caller", "No other insurance."),
+                        msg("agent", "Do you still live in San Diego County?"),
+                        msg("caller", "Yes, I still live in San Diego."),
+                        msg("agent", "Did you receive the yellow renewal packet from the county, and do you still have it?"),
+                        msg("caller", "I still have it."),
+                        msg("agent", "Since you still have the county's packet, I can help by phone or set up an in-person appointment. Which would you prefer?"),
+                        msg("caller", answer),
+                    ]
+                )
+                self.assertEqual(
+                    result["supporting_evidence"]["classified_answers"]["q5_choice"]["scenario_id"],
+                    "in_person",
+                )
+
+    def test_goal_achieved_marker_is_not_a_completion_signal(self):
+        result = self.result(
+            [
+                msg("agent", "First, would you like our help renewing your Medi-Cal right now, over the phone?"),
+                msg("caller", "Yes, please. [GOAL_ACHIEVED]"),
+            ]
+        )
+        self.assertIsNone(result["observed_disposition"])
+        self.assertEqual(result["task_completion_status"], UNCERTAIN)
+
+    def test_goal_achieved_marker_does_not_change_supplied_dataset_scoring(self):
+        data_path = Path(__file__).resolve().parents[1] / "data" / "gym_agent_conversations.json"
+        original = json.loads(data_path.read_text(encoding="utf-8"))
+        stripped = copy.deepcopy(original)
+        for thread in stripped["threads"]:
+            for message in thread["messages"]:
+                message["text"] = message["text"].replace("[GOAL_ACHIEVED]", "").rstrip()
+
+        def statuses(data):
+            return [
+                (
+                    r["thread_id"],
+                    r["workflow_status"],
+                    r["task_completion_status"],
+                    r["overall_status"],
+                    r["expected_disposition"],
+                    r["observed_disposition"],
+                )
+                for r in evaluate_dataset(data)["results"]
+            ]
+
+        self.assertEqual(statuses(original), statuses(stripped))
 
 
 if __name__ == "__main__":
