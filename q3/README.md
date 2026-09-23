@@ -2,6 +2,8 @@
 
 This directory contains the runnable Python evaluation harness for the healthcare workflow assessment.
 
+**[View the evaluation results](results.md)**: [`results.md`](results.md) is the human-readable report covering all 10 conversations. [`results.json`](results.json) contains the detailed machine-readable output and per-thread evidence.
+
 ## Evaluation Philosophy
 
 The evaluator separates four dimensions:
